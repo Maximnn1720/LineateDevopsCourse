@@ -1,0 +1,15 @@
+[Unit]
+Description=Homework 1: Standalone java service 
+Requires=nginx.service
+After=nginx.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/apps/
+ExecStart=/usr/bin/java -jar /usr/sbin/helloworld-0.1.0-SNAPSHOT-standalone.jar
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target
