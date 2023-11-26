@@ -1,0 +1,6 @@
+[development]
+13.53.207.94
+16.171.177.95
+
+[development:vars]
+ansible_python_interpreter=/usr/bin/python

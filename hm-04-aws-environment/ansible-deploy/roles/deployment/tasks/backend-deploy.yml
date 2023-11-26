@@ -1,0 +1,25 @@
+- name: Create the root folder
+  file: 
+    name: "{{ backend_app_root }}"
+    state: directory
+
+- name: Copy jar file to server
+  copy:
+     src: novikov-backend-app.jar
+     dest: "{{ backend_app_root }}/novikov-backend-app.jar"
+
+- name: Save java path
+  shell: which java
+  register: java_path
+
+- name: Populate an backend-app service config
+  template: 
+    src: novikov-backend-app.service.j2
+    dest: /etc/systemd/system/novikov-backend-app.service
+  # notify: reload novikov-backend-app
+
+- name: Enable backend-app service
+  service: 
+    name: novikov-backend-app
+    state: started
+    enabled: yes

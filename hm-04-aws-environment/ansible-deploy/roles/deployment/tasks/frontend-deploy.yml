@@ -1,0 +1,9 @@
+- name: Create the root folder
+  file: 
+    name: "{{ server_root_directory }}"
+    state: directory
+
+- name: Provision the index file
+  template: 
+    src: index.html.j2
+    dest: "{{ server_root_directory }}/index.html"  

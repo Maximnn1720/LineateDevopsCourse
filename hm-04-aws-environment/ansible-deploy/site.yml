@@ -1,0 +1,15 @@
+---
+- hosts: aws_ec2
+  remote_user: "{{ remote_user }}"
+
+  become: true
+
+  roles:
+    - role: configuration
+      tags: ["configuration"]
+
+    - role: deployment
+      tags: ["deployment"]
+
+  
+    

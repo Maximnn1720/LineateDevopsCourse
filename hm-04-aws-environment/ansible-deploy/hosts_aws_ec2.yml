@@ -1,0 +1,6 @@
+---
+plugin: amazon.aws.aws_ec2
+aws_access_key: AKIAVQDEP2BUDJKXRH7C
+aws_secret_key: 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
+hostnames:
+  - ip-address

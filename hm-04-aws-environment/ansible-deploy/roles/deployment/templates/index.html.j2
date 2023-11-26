@@ -1,0 +1,23 @@
+<h1> Welcome to {{ env }} </h1>
+
+{% for greeting in nginx_greetings%}
+<b>{{ greeting.name }}</b>: {{greeting.value}}
+</br>
+{% endfor %}
+
+<h2> {{ sensitive_variable }} </h2>
+
+<input type="submit" value="Push me" onclick="submit()">
+
+<script type="text/javascript">
+    function submit() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                alert(xhr.response);
+            }
+        }
+        xhr.open('get', this.location.href + 'api/', true);
+        xhr.send();
+    }
+</script>

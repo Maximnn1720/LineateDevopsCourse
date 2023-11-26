@@ -1,0 +1,8 @@
+remote_user: ec2-user
+ansible_python_interpreter: /usr/bin/python
+env: development
+nginx_greetings:
+  - { name: "Greetings, my name is ", value: "{{ ansible_hostname }}" }
+  - { name: "My kernel is ", value: "{{ ansible_kernel }}" }
+sensitive_variable: "{{ vault_sensitive_variable }}"
+backend_app_root: /app

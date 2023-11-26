@@ -1,0 +1,19 @@
+[Unit]
+Description=My Java driven simple service
+After=syslog.target network.target
+
+[Service]
+SuccessExitStatus=143
+
+User={{ remote_user }}
+Group={{ remote_user }}
+
+Type=simple
+
+Environment= {{ java_path.stdout_lines[0] }}
+WorkingDirectory={{ backend_app_root }}
+ExecStart={{ java_path.stdout_lines[0] }} -jar novikov-backend-app.jar
+ExecStop=/bin/kill -15 $MAINPID
+
+[Install]
+WantedBy=multi-user.target

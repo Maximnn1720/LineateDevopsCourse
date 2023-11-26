@@ -1,0 +1,14 @@
+server{
+    listen 80;
+
+    root {{ server_root_directory }};    
+
+
+    location = / {
+        index index.html;
+    }
+
+    location = /api/ {
+        proxy_pass http://localhost:3000;
+    }
+}
