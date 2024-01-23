@@ -1,0 +1,45 @@
+def workingDirectory = "hm-05-CI-unit/resources/"
+pipeline {
+    agent any
+
+    parameters {
+        string(defaultValue: "master", description: 'Deploy branch', name: 'PR_BRANCH')
+    }
+
+    stages {
+        stage('Quality check') {
+            steps {
+                build job: 'PR-verify', parameters: [string(name: 'PR_BRANCH', value: params.PR_BRANCH)]
+            }
+        }
+        stage('Build') {
+            steps {
+                dir("${workingDirectory}testApp") {
+                    sh 'npm run build'
+                }
+                sh "mkdir -p dist"
+                sh "cp '${workingDirectory}'testApp/dist/index.js dist/index.js"
+            }
+        }
+        stage('Deploy') {
+            environment {
+                AWS_ACCESS_KEY_ID = sh(returnStdout: true, script: 'ansible-vault view hm-05-CI-unit/resources/ansible-deploy/group_vars/aws_ec2/vault.yml --vault-password-file hm-05-CI-unit/resources/ansible-deploy/vault_secret | grep aws_access_key: | awk -F \':\' \'{print $2}\'').trim()
+                AWS_SECRET_ACCESS_KEY = sh(returnStdout: true, script: 'ansible-vault view hm-05-CI-unit/resources/ansible-deploy/group_vars/aws_ec2/vault.yml --vault-password-file hm-05-CI-unit/resources/ansible-deploy/vault_secret | grep aws_access_key_secret: | awk -F \':\' \'{print $2}\'').trim()
+                ARTIFACT_NAME = sh(returnStdout: true, script: "readlink -f dist/index.js").trim()
+            }
+            steps {
+                dir("${workingDirectory}/ansible-deploy") {
+                    ansiblePlaybook(
+                        credentialsId: 'key-novikov-devops-hometask-stack',
+                        playbook: 'site.yml',
+                        inventory: 'hosts_aws_ec2.yml',
+                        disableHostKeyChecking: true,
+                        extraVars: [
+                            artifact_name: [value: "$ARTIFACT_NAME", hidden: false]
+                        ]
+                    )
+                }
+            }
+        }
+    }
+}

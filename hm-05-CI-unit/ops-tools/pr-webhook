@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+    triggers {
+        GenericTrigger (
+            genericVariables: [
+                [key: 'DEVELOPER', value: '$.pull_request.user.login'],
+                [key: 'PR_NAME', value: '$.pull_request.user.title'],
+                [key: 'PR_BRANCH', value: '$.pull_request.head.ref'],
+                [key: 'IS_PR_MERGED', value: '$.pull_request.merged'],
+                [key: 'PR_MERGED_BASE', value: '$.pull_request.base.ref']
+            ],
+            causeString: '$DEVELOPER has updated PR $PR_NAME',
+
+            token: 'LINEATE',
+
+            printContributedVariables: false,
+            printPostContent: false,
+
+            silentResponse: false
+        )
+    }
+    stages {
+        stage('Echo parameters') {
+            steps {
+                sh 'echo "DEVELOPER: $DEVELOPER"'
+                sh 'echo "Is merged ? - $IS_PR_MERGED"'
+                sh 'echo "Merge base: $PR_MERGED_BASE"'
+                sh 'echo "branch name: $PR_BRANCH"'
+            }
+        }
+   }
+    post {
+        success {
+            build job: 'PR-verify', wait: false, parameters: [string(name: 'PR_BRANCH', value: String.valueOf(PR_BRANCH))]
+
+            sh 'echo isMerged: $IS_PR_MERGED'
+
+//            script {
+//                if (PR_MERGED_BASE == 'master' && IS_PR_MERGED == 'true')
+//                    build job: 'Build', parameters: [[$class: '$StringParameterValue', name: 'BUILD_BRANCH', value: "master"]]
+//            }
+        }
+    }
+}

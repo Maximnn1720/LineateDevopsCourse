@@ -1,0 +1,16 @@
+- name: Ensure that nginx is installed
+  yum: 
+    pkg: nginx
+    state: present
+
+- name: Populate an nginx config
+  template: 
+    src: site.conf.j2
+    dest: /etc/nginx/conf.d/site.conf
+  notify: reload nginx
+
+- name: Enable nginx service
+  service: 
+    name: nginx
+    state: started
+    enabled: yes
