@@ -1,0 +1,40 @@
+- name: Create the temp folder
+  file:
+    name: "/temp"
+    state: directory
+
+- name: Download and extract a prometheus agent
+  ansible.builtin.unarchive:
+    src: https://github.com/prometheus/node_exporter/releases/download/v1.7.0/node_exporter-1.7.0.linux-amd64.tar.gz
+    dest: /temp
+    remote_src: yes
+
+- name: Copy agent file
+  copy:
+     src: /temp/node_exporter-1.7.0.linux-amd64/node_exporter
+     dest: /usr/local/bin/node_exporter
+     remote_src: true
+
+- name: Add the user 'node_exporter'
+  ansible.builtin.user:
+    name: node_exporter
+    shell: /bin/false
+
+- name: Set up permissions for exec file
+  file:
+    path: /usr/local/bin/node_exporter
+    state: file
+    owner: node_exporter
+    group: node_exporter
+    mode: u=rwx,g=rwx,o=r
+
+- name: Populate an node_exporter service config
+  template: 
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+
+- name: Enable node_exporter service
+  service: 
+    name: node_exporter
+    state: started
+    enabled: yes

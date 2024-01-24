@@ -1,0 +1,25 @@
+{
+  "name": "testapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "testapp.js",
+  "scripts": {
+    "test": "mocha tests/**/*.ts",
+    "lint": "npx eslint *.js",
+    "build": "ncc build testapp.js -o dist"
+  },
+  "author": "novikov",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/supertest": "^2.0.16",
+    "chai": "^4.3.10",
+    "chai-http": "^4.4.0",
+    "eslint": "^8.55.0",
+    "mocha": "^10.2.0",
+    "supertest": "^6.3.3",
+    "@vercel/ncc": "^0.38.1"
+  }
+}

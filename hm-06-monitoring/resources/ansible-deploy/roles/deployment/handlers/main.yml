@@ -1,0 +1,4 @@
+- name: reload novikov-backend-app
+  service: 
+    name: novikov-backend-app
+    state: restarted

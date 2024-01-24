@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(defaultValue: "master", description: 'Pull request checking', name: 'PR_BRANCH')
+    }
+
+    stages {
+        stage('Install dependencies') {
+            steps {
+                dir("resources/testApp") {
+                    sh 'npm install --package-lock-only'
+                    sh 'npm ci'
+                }
+            }
+        }
+        stage('Quality check') {
+            steps {
+                dir("resources/testApp") {
+                    sh 'npm run lint'
+                    sh 'npm run test'
+                }
+            }
+        }
+    }
+}
