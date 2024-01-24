@@ -1,0 +1,19 @@
+- name: Enable SELinux
+  selinux: 
+    policy: targeted
+    state: permissive
+  notify: reboot instance
+
+- name: Allow nginx to bind tcp/80
+  seport: 
+    ports: 80
+    proto: tcp
+    setype: http_port_t
+    state: present
+
+- name: Allow node_exporter to bind tcp/9100
+  seport:
+    ports: 9100
+    proto: tcp
+    setype: http_port_t
+    state: present

@@ -1,0 +1,6 @@
+remote_user: ec2-user
+ansible_python_interpreter: /usr/bin/python
+env: development
+nginx_greetings:
+backend_app_root: /app
+node_version: 16

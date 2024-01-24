@@ -1,0 +1,19 @@
+- name: Add rpm package nodejs
+  shell: curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+
+- name: Ensure that essential packages are installed
+  yum:
+    name:
+    - nodejs
+    - git
+    - pip
+    state: present
+
+- name: Ensure that we have all python libraries
+  pip:
+    name:
+      - selinux
+
+- import_tasks: selinux.yml
+- import_tasks: nginx.yml
+- import_tasks: prometheus-agent-deploy.yml
