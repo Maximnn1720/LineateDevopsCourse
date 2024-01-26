@@ -1,0 +1,18 @@
+[Unit]
+Description=My nodejs driven simple service
+After=syslog.target network.target
+
+[Service]
+SuccessExitStatus=143
+
+User=backend
+Group=backend
+
+Type=simple
+
+WorkingDirectory={{ backend_app_root }}
+ExecStart=node novikov-backend-app.js
+ExecStop=/bin/kill -15 $MAINPID
+
+[Install]
+WantedBy=multi-user.target

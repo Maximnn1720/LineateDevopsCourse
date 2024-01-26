@@ -1,0 +1,2 @@
+- import_tasks: backend-deploy.yml
+- import_tasks: static-files-deploy.yml

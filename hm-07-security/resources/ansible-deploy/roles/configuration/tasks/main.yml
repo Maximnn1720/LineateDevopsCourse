@@ -1,0 +1,47 @@
+- name: Download rpm package nodejs
+  get_url:
+    url: https://rpm.nodesource.com/setup_18.x
+    dest: /
+  tags:  main_packages
+
+- name: Add rpm package nodejs
+  shell: sudo bash /setup_18.x
+  tags:  main_packages
+
+- name: Ensure that essential packages are installed
+  yum:
+    name:
+    - nodejs
+    - git
+    - pip
+    - iptables-services
+    - rsyslog
+    state: present
+  tags:  main_packages
+
+- name: Enable iptables service
+  service:
+    name: iptables
+    state: started
+    enabled: yes
+  tags:  main_packages
+
+- name: Enable rsyslog service
+  service:
+    name: rsyslog
+    state: started
+    enabled: yes
+  tags:  main_packages
+
+- name: Ensure that we have all python libraries
+  pip:
+    name:
+      - selinux
+  tags:  main_packages
+
+- import_tasks: selinux.yml
+  tags:  selinux
+- import_tasks: nginx.yml
+  tags:  nginx
+- import_tasks: permissions.yml
+  tags: permissions
