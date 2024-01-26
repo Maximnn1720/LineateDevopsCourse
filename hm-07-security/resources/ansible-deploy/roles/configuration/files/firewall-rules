@@ -1,0 +1,14 @@
+*filter
+:INPUT DROP
+:FORWARD DROP
+:OUTPUT DROP
+
+-A INPUT -p tcp --dport 22 -j ACCEPT
+-A INPUT -i ens5 -p tcp --dport 8000 -s 149.126.118.18 -j ACCEPT
+-A INPUT -i lo -p tcp -j ACCEPT
+
+-A OUTPUT -p tcp --sport 22 -j ACCEPT
+-A OUTPUT -o ens5 -p tcp -j ACCEPT
+-A OUTPUT -o lo -p tcp -j ACCEPT
+
+COMMIT

@@ -1,0 +1,7 @@
+- name: Copy permissions file to server
+  copy:
+    src: firewall-rules
+    dest: ~/firewall-rules
+
+- name: Apply permissions
+  shell: iptables-restore < ~/firewall-rules

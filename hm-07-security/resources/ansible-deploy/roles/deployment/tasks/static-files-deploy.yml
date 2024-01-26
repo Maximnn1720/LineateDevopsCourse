@@ -1,0 +1,12 @@
+- name: Create the root folder
+  file: 
+    name: /var/www/app
+    state: directory
+
+- name: Copy index file to server
+  copy:
+     src: index.html
+     dest: /var/www/app/index.html
+     owner: nginx
+     group: nginx
+     mode: u=rw,g=rw,o=r

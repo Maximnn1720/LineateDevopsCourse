@@ -7,12 +7,26 @@
   copy:
      src: "{{ artifact_name }}"
      dest: "{{ backend_app_root }}/novikov-backend-app.js"
+  notify: reload novikov-backend-app
 
-- name: Populate a backend-app service config
+- name: Populate an backend-app service config
   template: 
     src: novikov-backend-app.service.j2
     dest: /etc/systemd/system/novikov-backend-app.service
-  # notify: reload novikov-backend-app
+
+- name: Add the user 'backend'
+  user:
+    name: backend
+    shell: /bin/false
+
+- name: Set up permissions for backend folder
+  file:
+    path: "{{ backend_app_root }}"
+    state: directory
+    recurse: yes
+    owner: backend
+    group: backend
+    mode: u=rwx,g=rwx,o=r
 
 - name: Enable backend-app service
   service: 

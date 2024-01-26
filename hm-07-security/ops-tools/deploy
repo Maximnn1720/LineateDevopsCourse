@@ -1,0 +1,67 @@
+pipeline {
+    agent any
+
+    environment {
+        ANSIBLE_WORKING_DIRECTORY = "hm-07-security/resources/ansible-deploy"
+    }
+
+    parameters {
+        string(defaultValue: "master", description: 'Deploy branch', name: 'PR_BRANCH')
+        string(defaultValue: "all", description: 'Selected tags', name: 'TAGS')
+    }
+
+    stages {
+        stage('Quality check') {
+            steps {
+                build job: 'PR-verify', parameters: [string(name: 'PR_BRANCH', value: params.PR_BRANCH)]
+            }
+        }
+        stage('Build') {
+            steps {
+                dir("resources/testApp") {
+                    sh 'npm install'
+                    sh 'npm run build'
+                }
+                sh "mkdir -p dist"
+                sh "cp resources/testApp/dist/index.js dist/index.js"
+            }
+        }
+        stage('Deploy') {
+            environment {
+                AWS_ACCESS_KEY_ID = sh(returnStdout: true, script: 'ansible-vault view ${ANSIBLE_WORKING_DIRECTORY}/group_vars/aws_ec2/vault.yml --vault-password-file ${ANSIBLE_WORKING_DIRECTORY}/vault_secret | grep aws_access_key: | awk -F \':\' \'{print $2}\'').trim()
+                AWS_SECRET_ACCESS_KEY = sh(returnStdout: true, script: 'ansible-vault view ${ANSIBLE_WORKING_DIRECTORY}/group_vars/aws_ec2/vault.yml --vault-password-file ${ANSIBLE_WORKING_DIRECTORY}/vault_secret | grep aws_access_key_secret: | awk -F \':\' \'{print $2}\'').trim()
+                ARTIFACT_NAME = sh(returnStdout: true, script: "readlink -f dist/index.js").trim()
+            }
+            steps {
+                dir("${ANSIBLE_WORKING_DIRECTORY}") {
+                    script {
+                        if (env.TAGS == 'all') {
+                            echo 'Launching playbook with all tags'
+                            ansiblePlaybook(
+                                    credentialsId: 'key-novikov-devops-hometask-stack',
+                                    playbook: 'site.yml',
+                                    inventory: 'hosts_aws_ec2.yml',
+                                    disableHostKeyChecking: true,
+                                    extraVars: [
+                                            artifact_name: [value: "$ARTIFACT_NAME", hidden: false]
+                                    ]
+                            )
+                        } else {
+                            echo "Launching playbook with tags: ${TAGS}"
+                            ansiblePlaybook(
+                                    credentialsId: 'key-novikov-devops-hometask-stack',
+                                    playbook: 'site.yml',
+                                    inventory: 'hosts_aws_ec2.yml',
+                                    disableHostKeyChecking: true,
+                                    tags: "$TAGS",
+                                    extraVars: [
+                                            artifact_name: [value: "$ARTIFACT_NAME", hidden: false]
+                                    ]
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

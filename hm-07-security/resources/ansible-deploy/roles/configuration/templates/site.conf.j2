@@ -1,0 +1,16 @@
+server{
+    listen 8000;
+
+    root /var/www/app;
+
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location = /app {
+        rewrite ^/app(.*)$ /$1 break;
+        proxy_pass http://localhost:3000;
+    }
+}
